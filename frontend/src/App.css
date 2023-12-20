@@ -63,3 +63,7 @@ body{
     background-color: #F3B664;
     border-radius: 5px;
 }
+
+.statistics-container{
+    text-align: center;
+}

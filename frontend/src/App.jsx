@@ -26,6 +26,10 @@ function App() {
   });
   const [piechartinfolabels, setPieChartInfoLabels] = React.useState([]);
   const [piechartinfovalues, setPieChartInfoValues] = React.useState([]);
+  const [month_totalsale, setMonthTotalSale] = React.useState(0);
+  const [month_totalsold, setMonthTotalSold] = React.useState(0);
+  const [month_totalnotsold, setMonthTotalNotSold] = React.useState(0);
+  const [month_words, setMonthWords] = React.useState("March");
 
   async function getItems() {
     let url = `http://localhost:8080/api/search/${page_num}/${month}/${search_query}/${per_page}`;
@@ -85,9 +89,24 @@ function App() {
     setPieChartInfoValues(values_array);
   }
 
+  async function getStatisticsInfo() {
+    let url = `http://localhost:8080/api/statistics/${month}`;
+    let api_resp = await axios.get(url, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    setMonthTotalSale(api_resp.data.totalsale);
+    setMonthTotalSold(api_resp.data.totalsolditems);
+    setMonthTotalNotSold(api_resp.data.totalnotsolditems);
+  }
+
   useEffect(() => {
     getBarChartInfo();
     getPieChartInfo();
+    getStatisticsInfo();
   }, [month]);
 
   useEffect(() => {
@@ -95,7 +114,48 @@ function App() {
   }, [page_num, month, search_query, per_page]);
 
   function monthChangeHandler(event) {
-    setMonth(event.target.value);
+    let month_value = event.target.value;
+    let month_value_words = "";
+    switch (month_value) {
+      case "1":
+        month_value_words = "January";
+        break;
+      case "2":
+        month_value_words = "Februrary";
+        break;
+      case "3":
+        month_value_words = "March";
+        break;
+      case "4":
+        month_value_words = "April";
+        break;
+      case "5":
+        month_value_words = "May";
+        break;
+      case "6":
+        month_value_words = "June";
+        break;
+      case "7":
+        month_value_words = "July";
+        break;
+      case "8":
+        month_value_words = "August";
+        break;
+      case "9":
+        month_value_words = "September";
+        break;
+      case "10":
+        month_value_words = "October";
+        break;
+      case "11":
+        month_value_words = "November";
+        break;
+      case "12":
+        month_value_words = "December";
+        break;
+    }
+    setMonth(month_value);
+    setMonthWords(month_value_words);
   }
 
   function searchChangeHandler(event) {
@@ -217,8 +277,17 @@ function App() {
         </div>
       </div>
 
+      <div className="statistics-container">
+        <p className="text-Heading">Statistics for {month_words} month</p>
+        <p>Total sale: {month_totalsale}</p>
+        <p>Total Items sold: {month_totalsold}</p>
+        <p>Total Items not sold: {month_totalnotsold}</p>
+      </div>
+
       <div className="barchart-container">
-        <p className="text-heading">Bar Chart Based on Monthly Transactions</p>
+        <p className="text-heading">
+          Bar Chart Based on Monthly Transactions for {month_words}
+        </p>
         <Bar
           data={{
             labels: [
@@ -255,7 +324,9 @@ function App() {
       </div>
 
       <div className="piechart-container">
-        <p className="text-heading">Pie Chart based on monthly transactions</p>
+        <p className="text-heading">
+          Pie Chart based on monthly transactions for {month_words}
+        </p>
         <Pie
           data={{
             labels: piechartinfolabels,
